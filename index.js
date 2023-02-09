@@ -1,19 +1,26 @@
-// const batch = window.location.search.match(/channel=(\d+)/)[1];
+// let channel = window.location.search.match(/channel=(\d+)/)[1];
 // const user = window.location.search.match(/name=(.+)/)[1];
 
-// let batch = new URL(window.location.href).searchParams.get("channel");
+let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
 // let user = new URL(window.location.href).searchParams.get("name");
 
 // document.querySelector('#your-name').innerText = user;
+if (channel) {
+  window.localStorage.setItem('channel', channel)
+  channel = window.localStorage.getItem('channel')
+  document.querySelector("h1").innerText = `#${channel}`
+} else {
+  alert('Error: please provide the channel')
+}
 
+// const channel = 858; // change to your own channel id
+const baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
 
-const batch = 858; // change to your own batch id
-const baseUrl = `https://wagon-chat.herokuapp.com/${batch}/messages`;
-document.querySelector("h1").innerText = `#${batch}`
 
 if (window.localStorage.getItem('name')) {
   document.querySelector("#your-name").value = window.localStorage.getItem('name');
 }
+
 
 // Your turn to code!
 const messageBoard = document.querySelector('#messages');
@@ -26,8 +33,11 @@ const buildMsg = (message, name) => {
   const hours = time.getHours();
   const minutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes()
   return `<div class="msg d-flex ${name === message.author ? 'justify-content-end' : 'justify-content-start'}">
-            <div class="${name === message.author ? 'bg-warning bubble-right' : 'bg-light bubble-left'} py-2 px-3 my-1 col-8">
-              <div class="msg-container">
+            <div class="${name === message.author ? 'bg-warning bubble-right' : 'bg-light bubble-left'} py-2 px-3 my-1 col-8 d-flex align-items-center">
+              <div class="avatar">
+                <img src="https://github.com/${message.author}.png"/>
+              </div>
+              <div class="msg-container flex-grow-1">
                 <p class="m-0 p-0 border-bottom d-flex justify-content-between">
                   <strong>${message.author}</strong> <span class="date">${hours}:${minutes}</span>
                 </p>
@@ -78,13 +88,11 @@ const refresh = () => {
 
 const checkName = (inputName) => {
   if (inputName.value) {
-    inputName.classList.add('bg-dark');
-    inputName.classList.add('text-white');
-    inputName.classList.remove('bg-danger');
+    inputName.classList.remove('border-danger');
+    inputName.classList.remove('border');
   } else {
-    inputName.classList.add('bg-danger');
-    inputName.classList.remove('bg-dark');
-    inputName.classList.remove('text-white');
+    inputName.classList.add('border-danger');
+    inputName.classList.add('border');
   }
 }
 
