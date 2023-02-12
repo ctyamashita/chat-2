@@ -21,8 +21,6 @@ if (window.localStorage.getItem('name')) {
   document.querySelector("#your-name").value = window.localStorage.getItem('name');
 }
 
-
-// Your turn to code!
 const messageBoard = document.querySelector('#messages');
 
 const buildMsg = (message, name) => {
@@ -83,8 +81,6 @@ const refresh = () => {
 
     });
 };
-
-// btnRefresh.addEventListener('click', refresh);
 
 const checkName = (inputName) => {
   if (inputName.value) {
