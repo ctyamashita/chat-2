@@ -121,3 +121,10 @@ form.addEventListener("keyup", sendMessage);
 
 
 setInterval(() => { refresh(); }, 1000);
+
+
+const isAndroid = navigator.userAgent.toLocaleLowerCase().indexOf('android') > -1
+
+if (isAndroid) {
+  document.write(`<meta name="viewport" content="width=device-width,height=${window.innerHeight}", initial-scale="1.0"`)
+}
