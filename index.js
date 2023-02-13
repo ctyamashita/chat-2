@@ -11,6 +11,7 @@ if (channel) {
   document.querySelector("h1").innerText = `#${channel}`
 } else {
   alert('Error: please provide the channel')
+  document.querySelector('#your-message').classList.add('d-none')
 }
 
 // const channel = 858; // change to your own channel id
