@@ -1,10 +1,11 @@
 // let channel = window.location.search.match(/channel=(\d+)/)[1];
 // const user = window.location.search.match(/name=(.+)/)[1];
 
-let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
-// let user = new URL(window.location.href).searchParams.get("name");
 
-// document.querySelector('#your-name').innerText = user;
+// checking for previous data
+
+let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
+
 if (channel) {
   window.localStorage.setItem('channel', channel)
   channel = window.localStorage.getItem('channel')
@@ -14,13 +15,23 @@ if (channel) {
   document.querySelector('#your-message').classList.add('d-none')
 }
 
-// const channel = 858; // change to your own channel id
 const baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
 
+const inputName = document.querySelector("#your-name")
 
 if (window.localStorage.getItem('name')) {
-  document.querySelector("#your-name").value = window.localStorage.getItem('name');
+  inputName.value = window.localStorage.getItem('name');
 }
+
+if (!window.localStorage.getItem('validName') || window.localStorage.getItem('validName') === 'false') {
+  inputName.classList.add('border-danger');
+  inputName.classList.add('border');
+} else {
+  inputName.classList.remove('border-danger');
+  inputName.classList.remove('border');
+}
+
+// selecting message board
 
 const messageBoard = document.querySelector('#messages');
 
@@ -56,6 +67,7 @@ const refresh = () => {
   .then((data) => {
       const name = document.querySelector("#your-name").value;
       window.localStorage.setItem('name', name)
+
       if (lastMsg) {
         data.messages.forEach((message) => {
           if (message.id > lastMsg.id) {
@@ -79,33 +91,40 @@ const refresh = () => {
         });
       }
 
-
     });
 };
 
-const checkName = (inputName) => {
-  if (inputName.value) {
-    inputName.classList.remove('border-danger');
-    inputName.classList.remove('border');
-  } else {
+// checking if username is valid
+const isUsernameValid = (e) => {
+  const inputName = e.currentTarget
+  const src = `https://github.com/${inputName.value}.png`
+  const image = document.createElement("img")
+  image.src = src
+  inputName.classList.remove('border-danger');
+  inputName.classList.remove('border');
+  window.localStorage.setItem("validName", true)
+  image.onerror = function () {
     inputName.classList.add('border-danger');
     inputName.classList.add('border');
-  }
+    window.localStorage.setItem("validName", false)
+  };
+  image.remove();
 }
+
+const nameInput = document.querySelector('#your-name')
+nameInput.addEventListener('blur', isUsernameValid)
 
 const sendMessage = (event) => {
   event.preventDefault();
   const inputName = document.querySelector("#your-name");
   const msgInput = document.querySelector('#your-message');
 
-  checkName(inputName);
-
   if (event.key === "Enter" && msgInput === document.activeElement) {
-    if (!inputName.value) {
-      alert('Please add a username.')
+    if (window.localStorage.getItem("validName") === 'false') {
+      alert('Please add a valid username.')
     } else {
-      const yourMessage = document.querySelector('#your-message').value;
-      const yourName = document.querySelector('#your-name').value;
+      const yourMessage = msgInput.value;
+      const yourName = inputName.value;
       fetch(baseUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -117,15 +136,10 @@ const sendMessage = (event) => {
   }
 };
 
+
+
 const form = document.querySelector("#comment-form");
 form.addEventListener("keyup", sendMessage);
 
 
 setInterval(() => { refresh(); }, 1000);
-
-
-const isAndroid = navigator.userAgent.toLocaleLowerCase().indexOf('android') > -1
-
-if (isAndroid) {
-  document.write(`<meta name="viewport" content="width=device-width,height=${window.innerHeight}", initial-scale="1.0"`)
-}
