@@ -1,7 +1,3 @@
-// let channel = window.location.search.match(/channel=(\d+)/)[1];
-// const user = window.location.search.match(/name=(.+)/)[1];
-
-
 // checking for previous data
 
 let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
@@ -59,6 +55,26 @@ const buildMsg = (message, name) => {
           </div>`
 }
 
+// checking if username is valid
+const isUsernameValid = (e) => {
+  const inputName = e.currentTarget
+  const src = `https://github.com/${inputName.value}.png`
+  const image = document.createElement("img")
+  image.src = src
+  inputName.classList.remove('border-danger');
+  inputName.classList.remove('border');
+  window.localStorage.setItem("validName", true)
+  image.onerror = function () {
+    inputName.classList.add('border-danger');
+    inputName.classList.add('border');
+    window.localStorage.setItem("validName", false)
+  };
+  image.remove();
+}
+
+const nameInput = document.querySelector('#your-name')
+nameInput.addEventListener('blur', isUsernameValid)
+
 let lastMsg
 
 const refresh = () => {
@@ -93,26 +109,6 @@ const refresh = () => {
 
     });
 };
-
-// checking if username is valid
-const isUsernameValid = (e) => {
-  const inputName = e.currentTarget
-  const src = `https://github.com/${inputName.value}.png`
-  const image = document.createElement("img")
-  image.src = src
-  inputName.classList.remove('border-danger');
-  inputName.classList.remove('border');
-  window.localStorage.setItem("validName", true)
-  image.onerror = function () {
-    inputName.classList.add('border-danger');
-    inputName.classList.add('border');
-    window.localStorage.setItem("validName", false)
-  };
-  image.remove();
-}
-
-const nameInput = document.querySelector('#your-name')
-nameInput.addEventListener('blur', isUsernameValid)
 
 const sendMessage = (event) => {
   event.preventDefault();
