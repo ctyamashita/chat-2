@@ -3,6 +3,13 @@ body {
   overflow: hidden;
 }
 
+form {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 #your-name {
   font-weight: bolder;
   border: none;
@@ -33,7 +40,7 @@ body {
 #chatroom {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  height: 90%;
 }
 
 #messages::-webkit-scrollbar {
