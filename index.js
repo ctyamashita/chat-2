@@ -141,7 +141,7 @@ form.addEventListener("keyup", sendMessage);
 setInterval(() => {
   let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
   let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-  let viewport = document.querySelector("meta[name=viewport]");
-  viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
+  const body = document.querySelector("body");
+  body = `height: ${h}px; width: ${w}px`
   refresh();
 }, 1000);
