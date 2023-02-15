@@ -142,6 +142,6 @@ setInterval(() => {
   let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
   let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
   const body = document.querySelector("body");
-  body = `height: ${h}px; width: ${w}px`
+  body.style = `height: ${h}px; width: ${w}px`
   refresh();
 }, 1000);
