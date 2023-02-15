@@ -2,21 +2,11 @@
 
 let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
 
-if (channel) {
-  window.localStorage.setItem('channel', channel)
-  channel = window.localStorage.getItem('channel')
-  document.querySelector("h1").innerText = `#${channel}`
-} else {
+while (channel === '' || channel === null || !Number.isInteger(Number(channel))) {
   channel = prompt('Please provide the channel')
-  
-  if (channel === null || !Number.isInteger(Number(channel))) {
-    alert('Error: please provide the channel')
-    document.querySelector('#your-message').classList.add('d-none')
-  } else {
-    window.localStorage.setItem('channel', channel)
-    document.querySelector("h1").innerText = `#${channel}`
-  }
 }
+window.localStorage.setItem('channel', channel)
+document.querySelector("#channel").value = channel
 
 const baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
 
@@ -26,13 +16,53 @@ if (window.localStorage.getItem('name')) {
   inputName.value = window.localStorage.getItem('name');
 }
 
+const chatHeader = document.querySelector('#chat-header')
+
 if (!window.localStorage.getItem('validName') || window.localStorage.getItem('validName') === 'false') {
-  inputName.classList.add('border-danger');
-  inputName.classList.add('border');
+  chatHeader.classList.add('red');
 } else {
-  inputName.classList.remove('border-danger');
-  inputName.classList.remove('border');
+  chatHeader.classList.remove('red');
 }
+
+const areInputsValid = () => {
+  if (document.querySelector('#user')) document.querySelector('#user').remove()
+  const image = document.createElement("img")
+  const div = document.createElement('div')
+  const inputName = document.querySelector('#your-name')
+  const src = `https://github.com/${inputName.value}.png`
+  image.src = src
+  div.appendChild(image)
+  div.setAttribute('class', 'avatar')
+  div.setAttribute('id', 'user')
+  chatHeader.classList.remove('red');
+  window.localStorage.setItem("validName", true)
+  image.onerror = function () {
+    chatHeader.classList.add('red');
+    window.localStorage.setItem("validName", false)
+    div.remove()
+  };
+  const userInfo = chatHeader.lastElementChild
+  userInfo.setAttribute('style', 'display: flex; align-items: center')
+  userInfo.appendChild(div);
+
+  const channelInput = document.querySelector('#channel')
+  const channel = channelInput.value
+  if (channel === '' || channel === null || !Number.isInteger(Number(channel))) {
+    chatHeader.classList.add('red');
+    window.localStorage.setItem('validChannel', false)
+  } else {
+    chatHeader.classList.remove('red');
+    window.localStorage.setItem('validChannel', true)
+    window.localStorage.setItem('channel', channel)
+  }
+}
+
+areInputsValid()
+
+const channelInput = document.querySelector('#channel')
+const nameInput = document.querySelector('#your-name')
+channelInput.addEventListener('blur', areInputsValid)
+nameInput.addEventListener('blur', areInputsValid)
 
 // selecting message board
 
@@ -40,16 +70,17 @@ const messageBoard = document.querySelector('#messages');
 
 const buildMsg = (message, name) => {
   // prevent code injection
-  const content = message.content.replaceAll(/</g, "&lt").replaceAll(/>/g, "&gt");
+  const content = message.content
+    .replaceAll(/<\/small><br><small>/g, "$break$")
+    .replaceAll(/</g, "&lt").replaceAll(/>/g, "&gt")
+    .replaceAll(/\$break\$/g, "</small><br><small>")
 
   const time = new Date(message.created_at);
   const hours = time.getHours();
   const minutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes()
   return `<div class="msg d-flex ${name === message.author ? 'justify-content-end' : 'justify-content-start'}">
-            <div class="${name === message.author ? 'bg-warning bubble-right' : 'bg-light bubble-left'} py-2 px-3 my-1 col-8 d-flex align-items-center">
-              <div class="avatar">
-                <img src="https://github.com/${message.author}.png"/>
-              </div>
+            <div class="${name === message.author ? 'bubble-right' : 'bubble-left'} py-2 px-3 my-1 col-8 d-flex align-items-center">
+              ${name === message.author ? '' : `<div class="avatar"><img src="https://github.com/${message.author}.png"/></div>`}
               <div class="msg-container flex-grow-1">
                 <p class="m-0 p-0 border-bottom d-flex justify-content-between">
                   <strong>${message.author}</strong> <span class="date">${hours}:${minutes}</span>
@@ -62,27 +93,22 @@ const buildMsg = (message, name) => {
           </div>`
 }
 
-// checking if username is valid
-const isUsernameValid = (e) => {
-  const inputName = e.currentTarget
-  const src = `https://github.com/${inputName.value}.png`
-  const image = document.createElement("img")
-  image.src = src
-  inputName.classList.remove('border-danger');
-  inputName.classList.remove('border');
-  window.localStorage.setItem("validName", true)
-  image.onerror = function () {
-    inputName.classList.add('border-danger');
-    inputName.classList.add('border');
-    window.localStorage.setItem("validName", false)
-  };
-  image.remove();
+let lastMsg
+
+const mergeMsgs = (messages) => {
+  const fusedMsgs = []
+  messages.forEach((message, index) => {
+    const nextMsg = messages[index + 1]
+    if (nextMsg && nextMsg.author === message.author) {
+      nextMsg.content = message.content + '</small><br><small>' + nextMsg.content
+    } else {
+      fusedMsgs.push(message)
+      lastMsg = message
+    }
+  });
+  return fusedMsgs
 }
 
-const nameInput = document.querySelector('#your-name')
-nameInput.addEventListener('blur', isUsernameValid)
-
-let lastMsg
 
 const refresh = () => {
   fetch(baseUrl)
@@ -94,8 +120,14 @@ const refresh = () => {
       if (lastMsg) {
         data.messages.forEach((message) => {
           if (message.id > lastMsg.id) {
-
-            const msgContent = buildMsg(message, name)
+            let msgContent
+            if (message.author === lastMsg.author) {
+              const fusedMsg = mergeMsgs([lastMsg, message])[0]
+              messageBoard.lastElementChild.remove()
+              msgContent = buildMsg(fusedMsg, name)
+            } else {
+              msgContent = buildMsg(message, name)
+            }
             messageBoard.insertAdjacentHTML("beforeend", msgContent);
             if (document.querySelector('#messages').lastElementChild && lastMsg.id != message.id) {
               document.querySelector('#messages').lastElementChild.scrollIntoView();
@@ -106,12 +138,11 @@ const refresh = () => {
 
       } else {
         messageBoard.innerHTML = "";
-        data.messages.forEach((message) => {
-
-            const msgContent = buildMsg(message, name)
-            messageBoard.insertAdjacentHTML("beforeend", msgContent);
-            lastMsg = message
-        });
+        const fusedMsgs = mergeMsgs(data.messages)
+        fusedMsgs.forEach(message => {
+          const msgContent = buildMsg(message, name)
+          messageBoard.insertAdjacentHTML("beforeend", msgContent);
+        })
       }
 
     });
@@ -125,6 +156,8 @@ const sendMessage = (event) => {
   if (event.key === "Enter" && msgInput === document.activeElement) {
     if (window.localStorage.getItem("validName") === 'false') {
       alert('Please add a valid username.')
+    } else if (window.localStorage.getItem("validChannel") === 'false') {
+      alert('Please add a valid channel.')
     } else {
       const yourMessage = msgInput.value;
       const yourName = inputName.value;
@@ -145,10 +178,4 @@ const form = document.querySelector("#comment-form");
 form.addEventListener("keyup", sendMessage);
 
 
-setInterval(() => {
-  // let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-  // let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-  // const body = document.querySelector("body");
-  // body.style = `height: ${h}px; width: ${w}px`
-  refresh();
-}, 1000);
+setInterval(() => { refresh() }, 1000);

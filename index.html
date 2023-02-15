@@ -10,12 +10,17 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div id="bg"></div>
   <form action="#" id="comment-form">
     <div id="chatroom">
 
       <div id="chat-header">
-        <h1>Chat-Room 2.0</h1>
-        <input class="w-50" id="your-name" placeholder="Github username"></input>
+        <div id="channel-container">
+          <span id="hash">#</span><input id="channel" placeholder="Channel"></input>
+        </div>
+        <div>
+          <input id="your-name" placeholder="Github username"></input>
+        </div>
       </div>
       <div id="messages">
         <p>No messages =(</p>
