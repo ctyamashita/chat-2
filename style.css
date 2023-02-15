@@ -91,14 +91,14 @@ h1, p, input {
   }
 }
 
-@media (min-width:992px) {
+@media (min-height: 768px) {
   form {
-    height: 100vh;
+    height: 93vh;
   }
 }
 
-@media (min-width: 768px) {
+@media (min-height: 992px) {
   form {
-    height: 93vh
+    height: 100vh;
   }
 }
