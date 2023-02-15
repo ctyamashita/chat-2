@@ -14,6 +14,7 @@ if (channel) {
     document.querySelector('#your-message').classList.add('d-none')
   } else {
     window.localStorage.setItem('channel', channel)
+    document.querySelector("h1").innerText = `#${channel}`
   }
 }
 
