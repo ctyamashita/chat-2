@@ -1,6 +1,5 @@
 body {
-  min-height: calc(100vh - calc(100vh - 100%));
-  height: 100vh;
+  height: 88vh;
   display: flex;
   align-items: start;
   justify-content: center;
@@ -70,10 +69,6 @@ form {
   width: 100%;
 }
 
-/* #comment-form {
-  height: 100vh;
-} */
-
 #chat-header {
   background-color: white;
   padding: 12px;
@@ -93,9 +88,8 @@ h1, p, input {
 }
 
 @media (min-height: 540px) {
-  /* For a screen < 540px, this CSS will be read */
   body {
-    /* min-height: 100vh; */
-    /* min-height: calc(100vh - calc(100vh - 100%)); */
+    height: 100vh;
+    max-height: -webkit-fill-available;
   }
 }
