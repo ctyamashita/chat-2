@@ -1,8 +1,13 @@
-form {
-  height: 90vh;
+body {
+  height: 100vh;
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+form {
+  height: 88vh;
+  width: 100%;
 }
 
 #your-name {
