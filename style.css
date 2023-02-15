@@ -87,3 +87,9 @@ h1, p, input {
   border-radius: 50px;
   margin-right: 12px;
 }
+
+@media (min-height:540px) {
+  form {
+    height: 96vh;
+  }
+}
