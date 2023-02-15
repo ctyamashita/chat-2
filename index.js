@@ -142,7 +142,8 @@ inputs.forEach(input => {
   input.addEventListener("focus", function () {
     let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    document.body.style = `height: ${h}px; width: ${w}px`
+    let viewport = document.querySelector("meta[name=viewport]");
+    viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
   })
 })
 
