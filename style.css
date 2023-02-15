@@ -90,6 +90,6 @@ h1, p, input {
 
 @media (min-height:540px) {
   form {
-    height: 90vh;
+    height: 95vh;
   }
 }
