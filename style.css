@@ -7,8 +7,6 @@ body {
 form {
   height: 88vh;
   width: 100%;
-  position: fixed;
-  top: 0;
 }
 
 #your-name {
@@ -85,20 +83,15 @@ h1, p, input {
   margin-right: 12px;
 }
 
-@media (min-height:480px) {
+@media (min-height:540px) {
   form {
     height: 93vh;
   }
 }
 
-@media (min-height: 768px) {
-  form {
-    height: 93vh;
-  }
-}
-
-@media (min-height: 992px) {
+@media (min-width:1280px) {
   form {
     height: 100vh;
+    width: 40%;
   }
 }
