@@ -1,12 +1,12 @@
 body {
   height: 100vh;
   display: flex;
-  align-items: center;
+  align-items: start;
   justify-content: center;
 }
 
 form {
-  height: 88vh;
+  height: 88%;
   width: 100%;
 }
 
@@ -89,4 +89,11 @@ h1, p, input {
   height: 40px;
   border-radius: 50px;
   margin-right: 12px;
+}
+
+@media (min-height: 540px) {
+  /* For a screen < 540px, this CSS will be read */
+  form {
+    height: 100%;
+  }
 }
