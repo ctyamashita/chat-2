@@ -137,5 +137,19 @@ const sendMessage = (event) => {
 const form = document.querySelector("#comment-form");
 form.addEventListener("keyup", sendMessage);
 
+const inputs = document.querySelectorAll('input')
+inputs.forEach(input => {
+  input.addEventListener("focus", function () {
+    let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+    let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+    document.body.style.height = h
+    document.body.style.width = w
+  })
+})
+
+
 
 setInterval(() => { refresh(); }, 1000);
+
+
+    $("html, body").css({"width":w,"height":h});
