@@ -142,11 +142,8 @@ inputs.forEach(input => {
   input.addEventListener("focus", function () {
     let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
     let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    document.body.style.height = h
-    document.body.style.width = w
+    document.body.style = `height: ${h}; width: ${w}`
   })
 })
-
-
 
 setInterval(() => { refresh(); }, 1000);
