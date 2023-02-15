@@ -7,9 +7,9 @@ if (channel) {
   channel = window.localStorage.getItem('channel')
   document.querySelector("h1").innerText = `#${channel}`
 } else {
-  let channel = prompt('Please provide the channel')
+  channel = prompt('Please provide the channel')
   
-  if (!channel || !Number.isInteger(Number(channel))) {
+  if (channel === null || !Number.isInteger(Number(channel))) {
     alert('Error: please provide the channel')
     document.querySelector('#your-message').classList.add('d-none')
   } else {
