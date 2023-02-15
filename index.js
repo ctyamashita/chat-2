@@ -7,8 +7,8 @@ if (channel) {
   channel = window.localStorage.getItem('channel')
   document.querySelector("h1").innerText = `#${channel}`
 } else {
-  alert('Error: please provide the channel')
-  document.querySelector('#your-message').classList.add('d-none')
+  let channel = prompt('Please provide the channel')
+  window.localStorage.setItem('channel', channel)
 }
 
 const baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
