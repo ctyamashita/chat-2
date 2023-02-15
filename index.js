@@ -8,10 +8,12 @@ if (channel) {
   document.querySelector("h1").innerText = `#${channel}`
 } else {
   let channel = prompt('Please provide the channel')
-  window.localStorage.setItem('channel', channel)
-  if (!channel) {
+  
+  if (!channel || !Number(channel).isInteger()) {
     alert('Error: please provide the channel')
     document.querySelector('#your-message').classList.add('d-none')
+  } else {
+    window.localStorage.setItem('channel', channel)
   }
 }
 
