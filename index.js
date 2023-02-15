@@ -150,6 +150,3 @@ inputs.forEach(input => {
 
 
 setInterval(() => { refresh(); }, 1000);
-
-
-    $("html, body").css({"width":w,"height":h});
