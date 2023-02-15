@@ -96,3 +96,9 @@ h1, p, input {
     height: 100vh;
   }
 }
+
+@media (min-width: 768px) {
+  form {
+    height: 93vh
+  }
+}
