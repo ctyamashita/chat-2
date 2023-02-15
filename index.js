@@ -9,7 +9,7 @@ if (channel) {
 } else {
   let channel = prompt('Please provide the channel')
   
-  if (!channel || !Number(channel).isInteger()) {
+  if (!channel || !Number.isInteger(Number(channel))) {
     alert('Error: please provide the channel')
     document.querySelector('#your-message').classList.add('d-none')
   } else {
