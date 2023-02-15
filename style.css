@@ -139,6 +139,12 @@ p, input, span {
   form {
     width: 100%;
   }
+  #chat-header {
+    border-radius: 0;
+  }
+  #msg-container {
+    border-radius: 0;
+  }
 }
 
 @media (min-width:768px) {
