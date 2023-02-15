@@ -137,15 +137,11 @@ const sendMessage = (event) => {
 const form = document.querySelector("#comment-form");
 form.addEventListener("keyup", sendMessage);
 
-const inputs = document.querySelectorAll('input')
-inputs.forEach(input => {
-  input.addEventListener("focus", function () {
-    let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
-    let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
-    let viewport = document.querySelector("meta[name=viewport]");
-    viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
-  })
-})
 
-
-setInterval(() => { refresh(); }, 1000);
+setInterval(() => {
+  let w = Math.max(document.documentElement.clientWidth, window.innerWidth || 0);
+  let h = Math.max(document.documentElement.clientHeight, window.innerHeight || 0);
+  let viewport = document.querySelector("meta[name=viewport]");
+  viewport.setAttribute("content", "height=" + h + "px, width=" + w + "px, initial-scale=1.0");
+  refresh();
+}, 1000);
