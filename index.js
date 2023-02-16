@@ -170,17 +170,15 @@ const areInputsValid = () => {
       // lastMsg = false
       updateBubbles()
       window.localStorage.setItem('name', inputName.value)
-      const newName = inputName.value
-      if (!myUsernames.includes(newName)) myUsernames.push(newName)
-      window.localStorage.setItem('myNames', myUsernames)
     }
   }
 
   if (window.localStorage.getItem("validChannel") === "true") {
     if (window.localStorage.getItem('channel') != channel) {
       baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
-      users = []
       lastMsg = false
+      users = []
+      window.localStorage.setItem('myNames', '')
       window.localStorage.setItem('channel', channel)
     }
   }
@@ -238,6 +236,8 @@ const sendMessage = (event) => {
     } else {
       const yourMessage = msgInput.value;
       const yourName = window.localStorage.getItem('name')
+      if (!myUsernames.includes(yourName)) myUsernames.push(yourName)
+      window.localStorage.setItem('myNames', myUsernames)
       fetch(baseUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
