@@ -68,7 +68,7 @@ form {
 }
 
 #messages {
-  padding: 8px 0;
+  padding: 12px 0;
   flex-grow: 1;
   min-width: 330px;
   overflow-y: scroll;
@@ -81,6 +81,7 @@ form {
   background-color: #3c3c3c;
   padding: 12px;
   border-radius: 0 0 12px 12px;
+  transition-duration: .5s;
 }
 
 #chatroom {
@@ -93,21 +94,57 @@ form {
   display: none;
 }
 
-.bubble-left {
+.bubble-container-right {
+  display: flex;
+  justify-content: end;
+}
+
+.bubble-container-left {
+  display: flex;
+  justify-content: start;
+}
+
+.bubble {
+  display: flex;
+  align-items: start;
+  box-shadow: 2px 2px 16px rgb(0 0 0 / 10%);
+  width: fit-content;
+  margin: 0 12px 12px;
+  padding: 8px 16px;
+  min-width: 15%;
+  max-width: 80%;
+}
+
+.left {
   border-radius: 12px 12px 12px 0;
-  box-shadow: 0 0 12px rgba(0, 0, 0, .1);
-  margin-left: 12px;
   background-color: #F5F5F5;
 }
 
-.bubble-right {
+.left > .msg-container {
+  margin-left: 12px;
+}
+
+.right {
   border-radius: 12px 12px 0 12px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, .1);
-  margin-right: 12px;
   background-color: #EEE3AB;
 }
 
-#msg-container {
+.msg-head {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 4px;
+  border-bottom: solid 2px #2c8c993e
+}
+
+.msg-head > span {
+  margin-left: 12px;
+}
+
+.msg-container:last-child {
+  margin-bottom: .5em;
+}
+
+#msg-input-container {
   padding: 12px;
   border-radius: 12px 12px 0 0;
   background-color: white;
@@ -117,16 +154,18 @@ form {
   width: 100%;
 }
 
-p, input, span {
+input, span {
   padding: 0;
   margin: 0;
 }
 
 .avatar > img{
+  margin-top: 5px;
   width: 40px;
   height: 40px;
   border-radius: 50px;
-  margin-right: 12px;
+  border: solid 2px white;
+  box-shadow: 2px 2px 16px rgb(0 0 0 / 20%);
 }
 
 /* @media (min-height:540px) {
@@ -190,6 +229,7 @@ p, input, span {
 
 .red {
   background-color: #931621 !important;
+  transition-duration: .5s;
 }
 
 ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
@@ -225,4 +265,9 @@ p, input, span {
   border-radius: 50px;
   background: oldlace;
   transition-duration: 1s;
+}
+
+.msg-txt {
+  line-height: 1.2;
+  margin: 0;
 }
