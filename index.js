@@ -2,6 +2,10 @@
 
 let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
 
+let myUsernames = []
+
+let users = []
+
 while (channel === '' || channel === null || !Number.isInteger(Number(channel))) {
   channel = prompt('Please provide the channel')
 }
@@ -12,9 +16,18 @@ let baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
 
 const inputName = document.querySelector("#your-name")
 
+if (window.localStorage.getItem('myNames')) {
+  myUsernames = window.localStorage.getItem('myNames').split(',')
+}
+
+
 if (window.localStorage.getItem('name')) {
   inputName.value = window.localStorage.getItem('name');
+  if (!myUsernames.includes(inputName.value)) myUsernames.push(inputName.value)
+  window.localStorage.setItem('myNames', myUsernames)
 }
+
+
 
 const chatHeader = document.querySelector('#chat-header')
 
@@ -39,9 +52,9 @@ const buildMsg = (message, name) => {
   const time = new Date(message.created_at);
   const hours = time.getHours();
   const minutes = time.getMinutes() < 10 ? `0${time.getMinutes()}` : time.getMinutes()
-  return `<div class="${name === message.author ? 'bubble-container-right' : 'bubble-container-left'}">
+  return `<div class="${name === message.author ? 'bubble-container-right' : 'bubble-container-left'} ${message.author}">
             <div class="${name === message.author ? 'bubble right' : 'bubble left'}">
-              ${name === message.author ? '' : `<div class="avatar"><img src="https://github.com/${message.author}.png"/></div>`}
+              <div class="avatar ${name === message.author ? 'hide' : ''}"><img src="https://github.com/${message.author}.png"/></div>
               <div class="msg-container">
                 <p class="msg-head">
                   <strong>${message.author}</strong> <span class="date">${hours}:${minutes}</span>
@@ -69,6 +82,7 @@ const refresh = () => {
       }
 
       data.messages.forEach((message) => {
+        if (!users.includes(message.author)) users.push(message.author)
         if (message.id > lastMsg.id) {
           let msgContent
           if (message.author === lastMsg.author) {
@@ -85,29 +99,57 @@ const refresh = () => {
           lastMsg = message
         }
       });
+
+      if (users.length === 0) window.localStorage.setItem('myNames', '')
     });
 };
 
+const updateBubbles = () => {
+  const name = document.querySelector('#your-name').value
+  document.querySelector('#messages').childNodes.forEach(bubble => {
+    if (bubble.classList.contains(name)) {
+      bubble.classList.add('bubble-container-right')
+      bubble.firstElementChild.classList.add('right')
+      bubble.classList.remove('bubble-container-left')
+      bubble.firstElementChild.classList.remove('left')
+      bubble.firstElementChild.firstElementChild.classList.add('hide')
+    } else {
+      bubble.classList.remove('bubble-container-right')
+      bubble.firstElementChild.classList.remove('right')
+      bubble.classList.add('bubble-container-left')
+      bubble.firstElementChild.classList.add('left')
+      bubble.firstElementChild.firstElementChild.classList.remove('hide')
+    }
+  })
+}
+
 const areInputsValid = () => {
   if (document.querySelector('#user')) document.querySelector('#user').remove()
-  const image = document.createElement("img")
-  const div = document.createElement('div')
   const inputName = document.querySelector('#your-name')
-  const src = `https://github.com/${inputName.value}.png`
-  image.src = src
-  div.appendChild(image)
-  div.setAttribute('class', 'avatar')
-  div.setAttribute('id', 'user')
-  chatHeader.classList.remove('red');
-  window.localStorage.setItem("validName", true)
-  image.onerror = function () {
-    chatHeader.classList.add('red');
+
+  if (users.includes(inputName.value) && !myUsernames.includes(inputName.value)) {
     window.localStorage.setItem("validName", false)
-    div.remove()
-  };
-  const userInfo = chatHeader.lastElementChild
-  userInfo.setAttribute('style', 'display: flex; align-items: center')
-  userInfo.appendChild(div);
+    chatHeader.classList.add('red');
+    alert('Name already in use.')
+    inputName.value = ''
+  } else {
+    const image = document.createElement("img")
+    const div = document.createElement('div')
+    const src = `https://github.com/${inputName.value}.png`
+    image.src = src
+    div.appendChild(image)
+    div.setAttribute('class', 'avatar')
+    div.setAttribute('id', 'user')
+    chatHeader.classList.remove('red');
+    window.localStorage.setItem("validName", true)
+    image.onerror = function () {
+      chatHeader.classList.add('red');
+      window.localStorage.setItem("validName", false)
+      div.remove()
+    };
+    const userInfo = chatHeader.lastElementChild
+    userInfo.appendChild(div);
+  }
 
   const channelInput = document.querySelector('#channel')
   const channel = channelInput.value
@@ -116,20 +158,28 @@ const areInputsValid = () => {
     chatHeader.classList.add('red');
     window.localStorage.setItem('validChannel', false)
   } else {
-    chatHeader.classList.remove('red');
     window.localStorage.setItem('validChannel', true)
+  }
+
+  if (window.localStorage.getItem("validName") === "true" && window.localStorage.getItem("validChannel") === "true") {
+    chatHeader.classList.remove('red');
   }
 
   if (window.localStorage.getItem("validName") === "true") {
     if (window.localStorage.getItem('name') != inputName.value) {
-      lastMsg = false
+      // lastMsg = false
+      updateBubbles()
       window.localStorage.setItem('name', inputName.value)
+      const newName = inputName.value
+      if (!myUsernames.includes(newName)) myUsernames.push(newName)
+      window.localStorage.setItem('myNames', myUsernames)
     }
   }
 
   if (window.localStorage.getItem("validChannel") === "true") {
     if (window.localStorage.getItem('channel') != channel) {
       baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
+      users = []
       lastMsg = false
       window.localStorage.setItem('channel', channel)
     }
@@ -174,9 +224,6 @@ const generateIfLink = (word) => {
     return regex.test(word) ? `<a href="${word}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a>` : word
   }
 }
-
-
-
 
 
 const sendMessage = (event) => {

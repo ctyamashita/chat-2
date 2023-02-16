@@ -271,3 +271,12 @@ input, span {
   line-height: 1.2;
   margin: 0;
 }
+
+.hide {
+  display: none;
+}
+
+.name-container {
+  display: flex;
+  align-items: center;
+}
