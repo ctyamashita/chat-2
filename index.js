@@ -68,12 +68,39 @@ nameInput.addEventListener('blur', areInputsValid)
 
 const messageBoard = document.querySelector('#messages');
 
+
+const regex = /^https:\/\/(www\.|)([-a-zA-Z0-9@:%._\+~#=]{1,256})\.[a-zA-Z0-9()]{1,6}\S*/
+
+const addYoutubeVideo = (url) => {
+  const idRegex = /https:\/\/www\.youtube\.com\/watch\?v=(\w+)/
+  if (!!url.match(idRegex)) {
+    const id = url.match(idRegex)[1]
+    return `<iframe width="100%" height="260" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; web-share" allowfullscreen></iframe>`
+  }
+  return `<a href="${url}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${url.match(regex)[2]}</strong></a>`
+}
+
+const generateIfLink = (word) => {
+  if (regex.test(word) && word.match(regex)[2] && word.match(regex)[2] === 'youtube') {
+    return addYoutubeVideo(word)
+  } else {
+    return regex.test(word) ? `<a href="${word}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${word.match(regex)[2]}</strong></a>` : word
+  }
+}
+
+const buildLine = (messageContent) => {
+  return `<br><small>${generateIfLink(messageContent)}</small>`
+}
+
+
 const buildMsg = (message, name) => {
-  // prevent code injection
-  const content = message.content
-    .replaceAll(/<\/small><br><small>/g, "$break$")
+  // link regex
+
+  // preventing code injection
+  let content = message.content
     .replaceAll(/</g, "&lt").replaceAll(/>/g, "&gt")
-    .replaceAll(/\$break\$/g, "</small><br><small>")
+
+    content =  generateIfLink(content)
 
   const time = new Date(message.created_at);
   const hours = time.getHours();
@@ -85,9 +112,7 @@ const buildMsg = (message, name) => {
                 <p class="m-0 p-0 border-bottom d-flex justify-content-between">
                   <strong>${message.author}</strong> <span class="date">${hours}:${minutes}</span>
                 </p>
-                <small>
-                  ${content}
-                </small>
+                ${buildLine(message.content)}
               </div>
             </div>
           </div>`
@@ -95,19 +120,19 @@ const buildMsg = (message, name) => {
 
 let lastMsg
 
-const mergeMsgs = (messages) => {
-  const fusedMsgs = []
-  messages.forEach((message, index) => {
-    const nextMsg = messages[index + 1]
-    if (nextMsg && nextMsg.author === message.author) {
-      nextMsg.content = message.content + '</small><br><small>' + nextMsg.content
-    } else {
-      fusedMsgs.push(message)
-      lastMsg = message
-    }
-  });
-  return fusedMsgs
-}
+// const mergeMsgs = (messages) => {
+//   const fusedMsgs = []
+//   messages.forEach((message, index) => {
+//     const nextMsg = messages[index + 1]
+//     if (nextMsg && nextMsg.author === message.author) {
+//       nextMsg.content = message.content + '</small><br><small>' + nextMsg.content
+//     } else {
+//       fusedMsgs.push(message)
+//       lastMsg = message
+//     }
+//   });
+//   return fusedMsgs
+// }
 
 
 const refresh = () => {
@@ -122,13 +147,12 @@ const refresh = () => {
           if (message.id > lastMsg.id) {
             let msgContent
             if (message.author === lastMsg.author) {
-              const fusedMsg = mergeMsgs([lastMsg, message])[0]
-              messageBoard.lastElementChild.remove()
-              msgContent = buildMsg(fusedMsg, name)
+              msgContent = buildLine(message.content)
+              messageBoard.lastElementChild.lastElementChild.firstElementChild.insertAdjacentHTML("beforeend", msgContent);
             } else {
-              msgContent = buildMsg(message, name)
+              msgContent = buildMsg(message, name);
+              messageBoard.insertAdjacentHTML("beforeend", msgContent);
             }
-            messageBoard.insertAdjacentHTML("beforeend", msgContent);
             if (document.querySelector('#messages').lastElementChild && lastMsg.id != message.id) {
               document.querySelector('#messages').lastElementChild.scrollIntoView();
             }
@@ -138,10 +162,10 @@ const refresh = () => {
 
       } else {
         messageBoard.innerHTML = "";
-        const fusedMsgs = mergeMsgs(data.messages)
-        fusedMsgs.forEach(message => {
+        data.messages.forEach(message => {
           const msgContent = buildMsg(message, name)
           messageBoard.insertAdjacentHTML("beforeend", msgContent);
+          lastMsg = message
         })
       }
 

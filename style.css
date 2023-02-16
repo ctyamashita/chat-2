@@ -135,7 +135,7 @@ p, input, span {
   }
 } */
 
-@media (min-height:480px) {
+@media (min-width:330px) {
   form {
     width: 100%;
   }
@@ -151,6 +151,14 @@ p, input, span {
   form {
     /* height: 100vh; */
     width: 80%;
+  }
+
+  #chat-header {
+    border-radius: 0 0 12px 12px;
+  }
+
+  #msg-container {
+    border-radius: 12px 12px 0 0;
   }
 }
 
@@ -200,4 +208,21 @@ p, input, span {
 #channel-container {
   z-index: 1;
   display: flex;
+}
+
+.link {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+  color: #2C8C99;
+  transition-duration: .3s;
+}
+
+.link:hover {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
+  color: #28464B;
+  padding: 0 8px 0 6px;
+  border-radius: 50px;
+  background: oldlace;
+  transition-duration: 1s;
 }
