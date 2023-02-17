@@ -4,8 +4,6 @@ let channel = new URL(window.location.href).searchParams.get("channel") || windo
 
 let users = []
 
-let myName = ''
-
 while (channel === '' || channel === null || !Number.isInteger(Number(channel))) {
   channel = prompt('Please provide the channel')
 }
@@ -23,8 +21,10 @@ if (window.localStorage.getItem('name')) {
 const chatHeader = document.querySelector('#chat-header')
 
 if (!window.localStorage.getItem('validName') || window.localStorage.getItem('validName') === 'false') {
+  window.localStorage.setItem('validName', 'false')
   chatHeader.classList.add('red');
 } else {
+  window.localStorage.setItem('validName', 'true')
   chatHeader.classList.remove('red');
 }
 
