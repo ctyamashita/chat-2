@@ -181,7 +181,7 @@ input, span {
   #chat-header {
     border-radius: 0;
   }
-  #msg-container {
+  #msg-input-container {
     border-radius: 0;
   }
 }
@@ -196,7 +196,7 @@ input, span {
     border-radius: 0 0 12px 12px;
   }
 
-  #msg-container {
+  #msg-input-container {
     border-radius: 12px 12px 0 0;
   }
 }
