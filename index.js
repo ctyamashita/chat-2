@@ -124,7 +124,7 @@ const areInputsValid = () => {
     alert('Name already in use.')
     inputName.value = ''
   } else {
-    const image = document.createElement("img")p
+    const image = document.createElement("img")
     const div = document.createElement('div')
     image.src = `https://github.com/${inputName.value}.png`
     div.appendChild(image)
