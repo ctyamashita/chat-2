@@ -2,26 +2,23 @@
 
 let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
 
-let myUsernames = []
-
 let users = []
 
-while (channel === '' || channel === null || !Number.isInteger(Number(channel))) {
+let myName = ''
+
+const invalidChannel = channel === '' || channel === null || !Number.isInteger(Number(channel))
+
+while (invalidChannel) {
   channel = prompt('Please provide the channel')
 }
+
 window.localStorage.setItem('channel', channel)
 document.querySelector("#channel").value = channel
 
 let baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
 
-const inputName = document.querySelector("#your-name")
-
-if (window.localStorage.getItem('myNames')) {
-  myUsernames = window.localStorage.getItem('myNames').split(',')
-}
-
-
 if (window.localStorage.getItem('name')) {
+  const inputName = document.querySelector("#your-name")
   inputName.value = window.localStorage.getItem('name');
 }
 
@@ -36,7 +33,6 @@ if (!window.localStorage.getItem('validName') || window.localStorage.getItem('va
 const buildLine = (messageContent) => {
   return `<p class="msg-txt">${generateIfLink(messageContent)}</p>`
 }
-
 
 const buildMsg = (message, name) => {
   // preventing code injection
@@ -68,6 +64,7 @@ const refresh = () => {
   .then(response => response.json())
   .then((data) => {
       const name = window.localStorage.getItem('name');
+      if (users.includes(name)) areInputsValid()
       if (!lastMsg) {
         messageBoard.innerHTML = "";
         lastMsg = data.messages[0]
@@ -96,14 +93,12 @@ const refresh = () => {
           lastMsg = message
         }
       });
-
-      if (users.length === 0) window.localStorage.setItem('myNames', '')
     });
 };
 
 const updateBubbles = () => {
-  const name = document.querySelector('#your-name').value
-  if (name) {
+  if (window.localStorage.getItem('validName') === 'true') {
+    const name = document.querySelector('#your-name').value
     document.querySelector('#messages').childNodes.forEach(bubble => {
       if (bubble.classList.contains(name)) {
         bubble.classList.add('bubble-container-right')
@@ -123,19 +118,19 @@ const updateBubbles = () => {
 }
 
 const areInputsValid = () => {
-  if (document.querySelector('#user')) document.querySelector('#user').remove()
   const inputName = document.querySelector('#your-name')
+  const chatHeader = document.querySelector('#chat-header')
 
-  if (users.includes(inputName.value) && !myUsernames.includes(inputName.value)) {
+  if (users.includes(inputName.value) && window.localStorage.getItem("myName") != window.localStorage.getItem("name")) {
     window.localStorage.setItem("validName", false)
+    window.localStorage.setItem("myName", '')
     chatHeader.classList.add('red');
     alert('Name already in use.')
     inputName.value = ''
   } else {
     const image = document.createElement("img")
     const div = document.createElement('div')
-    const src = `https://github.com/${inputName.value}.png`
-    image.src = src
+    image.src = `https://github.com/${inputName.value}.png`
     div.appendChild(image)
     div.setAttribute('class', 'avatar')
     div.setAttribute('id', 'user')
@@ -146,8 +141,9 @@ const areInputsValid = () => {
       window.localStorage.setItem("validName", false)
       div.remove()
     };
-    const userInfo = chatHeader.lastElementChild
-    userInfo.appendChild(div);
+    const userInfo = chatHeader.lastElementChild;
+    if (document.querySelector(`#user`)) document.querySelector(`#user`).remove()
+    if (window.localStorage.getItem("validName") === 'true') userInfo.appendChild(div)
   }
 
   const channelInput = document.querySelector('#channel')
@@ -165,7 +161,7 @@ const areInputsValid = () => {
   }
 
   if (window.localStorage.getItem("validName") === "true") {
-    if (window.localStorage.getItem('name') != inputName.value && !users.includes(inputName.value)) {
+    if (window.localStorage.getItem('name') != inputName.value) {
       // lastMsg = false
       updateBubbles()
       window.localStorage.setItem('name', inputName.value)
@@ -177,7 +173,8 @@ const areInputsValid = () => {
       baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
       lastMsg = false
       users = []
-      window.localStorage.setItem('myNames','')
+      window.localStorage.setItem('name', inputName.value)
+      window.localStorage.setItem('myName','')
       window.localStorage.setItem('channel', channel)
     }
   }
@@ -230,23 +227,23 @@ const sendMessage = (event) => {
 
   if (event.key === "Enter" && msgInput === document.activeElement) {
     if (window.localStorage.getItem("validName") === 'false') {
-      alert('Please add a valid username.')
+      if (users.includes(currentName)) {
+        alert('Name already in use.')
+      } else {
+        alert('Please add a valid username.')
+      }
     } else if (window.localStorage.getItem("validChannel") === 'false') {
       alert('Please add a valid channel.')
-    } else if (users.includes(currentName) && !myUsernames.includes(currentName)) {
-      document.querySelector('#your-name').value = ''
-      alert('Name already in use.')
     } else {
       const yourMessage = msgInput.value;
       const yourName = window.localStorage.getItem('name')
-      if (!(myUsernames.includes(yourName))) myUsernames.push(yourName)
-      window.localStorage.setItem('myNames', myUsernames)
       fetch(baseUrl, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ author: yourName, content: yourMessage }),
       });
       document.querySelector('#your-message').value = ''
+      window.localStorage.setItem('myName', currentName)
       refresh();
     }
   }
@@ -258,4 +255,6 @@ const form = document.querySelector("#comment-form");
 form.addEventListener("keyup", sendMessage);
 
 
-setInterval(() => { refresh() }, 1000);
+setInterval(() => {
+  refresh()
+}, 1000);
