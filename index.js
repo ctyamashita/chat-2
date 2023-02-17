@@ -6,9 +6,7 @@ let users = []
 
 let myName = ''
 
-const invalidChannel = channel === '' || channel === null || !Number.isInteger(Number(channel))
-
-while (invalidChannel) {
+while (channel === '' || channel === null || !Number.isInteger(Number(channel))) {
   channel = prompt('Please provide the channel')
 }
 
