@@ -74,7 +74,7 @@ form {
   overflow-y: scroll;
 }
 
-#chat-header {
+.chat-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -178,10 +178,13 @@ input, span {
   form {
     width: 100%;
   }
-  #chat-header {
+  .chat-header {
     border-radius: 0;
   }
   #msg-input-container {
+    border-radius: 0;
+  }
+  .initial-pos-head {
     border-radius: 0;
   }
 }
@@ -192,7 +195,7 @@ input, span {
     width: 80%;
   }
 
-  #chat-header {
+  .chat-header {
     border-radius: 0 0 12px 12px;
   }
 
@@ -279,4 +282,15 @@ input, span {
 .name-container {
   display: flex;
   align-items: center;
+}
+
+.initial-pos-head {
+  margin-top: 50%;
+  border-radius: 12px;
+}
+
+.initial-pos-msg {
+  display: flex;
+  align-items: center;
+  justify-content: center
 }
