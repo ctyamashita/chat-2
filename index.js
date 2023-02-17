@@ -119,14 +119,14 @@ const areInputsValid = () => {
   const inputName = document.querySelector('#your-name')
   const chatHeader = document.querySelector('#chat-header')
 
-  if (users.includes(inputName.value) && window.localStorage.getItem("myName") != window.localStorage.getItem("name")) {
+  if (users.includes(inputName.value) && window.localStorage.getItem("name") != inputName.value) {
     window.localStorage.setItem("validName", false)
     window.localStorage.setItem("myName", '')
     chatHeader.classList.add('red');
     alert('Name already in use.')
     inputName.value = ''
   } else {
-    const image = document.createElement("img")
+    const image = document.createElement("img")p
     const div = document.createElement('div')
     image.src = `https://github.com/${inputName.value}.png`
     div.appendChild(image)
