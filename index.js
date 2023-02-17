@@ -23,11 +23,7 @@ if (window.localStorage.getItem('myNames')) {
 
 if (window.localStorage.getItem('name')) {
   inputName.value = window.localStorage.getItem('name');
-  if (!myUsernames.includes(inputName.value)) myUsernames.push(inputName.value)
-  window.localStorage.setItem('myNames', myUsernames)
 }
-
-
 
 const chatHeader = document.querySelector('#chat-header')
 
@@ -78,6 +74,7 @@ const refresh = () => {
         if (lastMsg) {
           const msg = buildMsg(lastMsg, name);
           messageBoard.insertAdjacentHTML("beforeend", msg);
+          users.push(lastMsg.author)
         }
       }
 
@@ -106,21 +103,23 @@ const refresh = () => {
 
 const updateBubbles = () => {
   const name = document.querySelector('#your-name').value
-  document.querySelector('#messages').childNodes.forEach(bubble => {
-    if (bubble.classList.contains(name)) {
-      bubble.classList.add('bubble-container-right')
-      bubble.firstElementChild.classList.add('right')
-      bubble.classList.remove('bubble-container-left')
-      bubble.firstElementChild.classList.remove('left')
-      bubble.firstElementChild.firstElementChild.classList.add('hide')
-    } else {
-      bubble.classList.remove('bubble-container-right')
-      bubble.firstElementChild.classList.remove('right')
-      bubble.classList.add('bubble-container-left')
-      bubble.firstElementChild.classList.add('left')
-      bubble.firstElementChild.firstElementChild.classList.remove('hide')
-    }
-  })
+  if (name) {
+    document.querySelector('#messages').childNodes.forEach(bubble => {
+      if (bubble.classList.contains(name)) {
+        bubble.classList.add('bubble-container-right')
+        bubble.firstElementChild.classList.add('right')
+        bubble.classList.remove('bubble-container-left')
+        bubble.firstElementChild.classList.remove('left')
+        bubble.firstElementChild.firstElementChild.classList.add('hide')
+      } else {
+        bubble.classList.remove('bubble-container-right')
+        bubble.firstElementChild.classList.remove('right')
+        bubble.classList.add('bubble-container-left')
+        bubble.firstElementChild.classList.add('left')
+        bubble.firstElementChild.firstElementChild.classList.remove('hide')
+      }
+    })
+  }
 }
 
 const areInputsValid = () => {
@@ -166,7 +165,7 @@ const areInputsValid = () => {
   }
 
   if (window.localStorage.getItem("validName") === "true") {
-    if (window.localStorage.getItem('name') != inputName.value) {
+    if (window.localStorage.getItem('name') != inputName.value && !users.includes(inputName.value)) {
       // lastMsg = false
       updateBubbles()
       window.localStorage.setItem('name', inputName.value)
@@ -178,7 +177,7 @@ const areInputsValid = () => {
       baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
       lastMsg = false
       users = []
-      window.localStorage.setItem('myNames', '')
+      window.localStorage.setItem('myNames','')
       window.localStorage.setItem('channel', channel)
     }
   }
@@ -227,16 +226,20 @@ const generateIfLink = (word) => {
 const sendMessage = (event) => {
   event.preventDefault();
   const msgInput = document.querySelector('#your-message');
+  const currentName = document.querySelector('#your-name').value
 
   if (event.key === "Enter" && msgInput === document.activeElement) {
     if (window.localStorage.getItem("validName") === 'false') {
       alert('Please add a valid username.')
     } else if (window.localStorage.getItem("validChannel") === 'false') {
       alert('Please add a valid channel.')
+    } else if (users.includes(currentName) && !myUsernames.includes(currentName)) {
+      document.querySelector('#your-name').value = ''
+      alert('Name already in use.')
     } else {
       const yourMessage = msgInput.value;
       const yourName = window.localStorage.getItem('name')
-      if (!myUsernames.includes(yourName)) myUsernames.push(yourName)
+      if (!(myUsernames.includes(yourName))) myUsernames.push(yourName)
       window.localStorage.setItem('myNames', myUsernames)
       fetch(baseUrl, {
         method: "POST",
