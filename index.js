@@ -112,16 +112,16 @@ const fetchMessages = () => {
             messageBoard.append(msg);
             users.push(lastMsg.author)
           }
-          data.messages.forEach((message) => {
-            if (!users.includes(message.author)) users.push(message.author)
-            if (message.id > lastMsg.id) {
-              addMessage(message)
-              if (lastMsg.id != message.id) messageBoard.lastElementChild.scrollIntoView();
-              lastMsg = message
-              previousData = data
-            }
-          });
         }
+        data.messages.forEach((message) => {
+          if (!users.includes(message.author)) users.push(message.author)
+          if (message.id > lastMsg.id) {
+            addMessage(message)
+            if (lastMsg.id != message.id) messageBoard.lastElementChild.scrollIntoView();
+            lastMsg = message
+            previousData = data
+          }
+        });
 
       }
     });
