@@ -21,10 +21,8 @@ if (window.localStorage.getItem('name')) {
 const chatHeader = document.querySelector('#chat-header')
 
 if (!window.localStorage.getItem('validName') || window.localStorage.getItem('validName') === 'false') {
-  window.localStorage.setItem('validName', 'false')
   chatHeader.classList.add('red');
 } else {
-  window.localStorage.setItem('validName', 'true')
   chatHeader.classList.remove('red');
 }
 
@@ -119,7 +117,7 @@ const areInputsValid = () => {
   const inputName = document.querySelector('#your-name')
   const chatHeader = document.querySelector('#chat-header')
 
-  if (users.includes(inputName.value) && window.localStorage.getItem("name") != inputName.value) {
+  if (users.includes(inputName.value) && window.localStorage.getItem("myName") != inputName.value) {
     window.localStorage.setItem("validName", false)
     window.localStorage.setItem("myName", '')
     chatHeader.classList.add('red');
