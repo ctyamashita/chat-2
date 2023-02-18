@@ -148,6 +148,7 @@ form {
   padding: 12px;
   border-radius: 12px 12px 0 0;
   background-color: white;
+  transition: .3s ease;
 }
 
 #your-message {
@@ -276,7 +277,8 @@ input, span {
 }
 
 .hide {
-  display: none;
+  opacity: 0;
+  transform: translateY(50px) scaleY(0);
 }
 
 .name-container {
@@ -285,13 +287,7 @@ input, span {
 }
 
 .initial-pos-head {
-  margin-top: 50vh;
+  margin: 50vh 12px 0;
   transform: translateY(-50%);
   border-radius: 12px;
-}
-
-.initial-pos-msg {
-  display: flex;
-  align-items: center;
-  justify-content: center
 }
