@@ -12,6 +12,9 @@ let baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
 if (window.localStorage.getItem('name')) {
   const inputName = document.querySelector("#your-name")
   inputName.value = window.localStorage.getItem('name');
+} else {
+  window.localStorage.setItem('name', '')
+  window.localStorage.setItem('myName', '')
 }
 
 
@@ -92,8 +95,6 @@ const addMessage = (message) => {
   }
 }
 
-let previousData
-
 const fetchMessages = () => {
   const channel = window.localStorage.getItem('channel')
   const baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`
@@ -103,8 +104,8 @@ const fetchMessages = () => {
       if (data.messages.length > 0) {
         const name = window.localStorage.getItem('name');
 
-        if (users.includes(name) && window.localStorage.getItem('myName') === '') areInputsValid()
-        if (!lastMsg || previousData.channel != data.channel) {
+        if (users.includes(name) && window.localStorage.getItem('myName') != `${name}@${channel}`) areInputsValid()
+        if (!lastMsg) {
           messageBoard.innerHTML = "";
           lastMsg = data.messages[0]
           if (lastMsg) {
@@ -119,7 +120,6 @@ const fetchMessages = () => {
             addMessage(message)
             if (lastMsg.id != message.id) messageBoard.lastElementChild.scrollIntoView();
             lastMsg = message
-            previousData = data
           }
         });
 
@@ -169,17 +169,22 @@ const areInputsValid = () => {
   const chatHeader = document.querySelector('.chat-header')
   const msgInput = document.querySelector('#msg-input-container')
   const messageContainer = document.querySelector('#messages')
+  const oldChannel = window.localStorage.getItem('channel')
 
   if (!(channel === '' || channel === null || !Number.isInteger(Number(channel)))) {
     chatHeader.classList.remove('initial-pos-head');
     msgInput.classList.remove('hide');
     messageContainer.classList.remove('hide');
-    if (window.localStorage.getItem('channel') != channel) {
+    if (oldChannel != channel) {
       baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
       lastMsg = false
+      messageContainer.innerHTML = ''
       users = []
-      window.localStorage.setItem('myName',inputName.value)
-      refresh()
+      window.localStorage.setItem('name', inputName.value)
+      if (inputName.value != '' && document.querySelector(`.${inputName.value}`)) {
+        window.localStorage.setItem('myName',`${inputName.value}@${oldChannel}`)
+      }
+      if (channel != '' && oldChannel === channel) location.reload()
     }
     validChannel = true
     window.localStorage.setItem('channel', channel)
@@ -191,29 +196,34 @@ const areInputsValid = () => {
     channelInput.value = ''
   }
 
-  if (users.includes(inputName.value) && window.localStorage.getItem("myName") === '') {
+  console.log(window.localStorage.getItem("myName"), channel, oldChannel)
+
+  if (users.includes(inputName.value) && window.localStorage.getItem("myName") != `${inputName.value}@${oldChannel}`) {
     validName = false
-    const name = window.localStorage.getItem('name')
-    window.localStorage.setItem("myName", name)
     alert('Name already in use.')
-    inputName.value = name
-  } else if (inputName.value != '') {
-    const image = document.createElement("img")
-    const div = document.createElement('div')
-    image.src = `https://github.com/${inputName.value}.png`
-    div.appendChild(image)
-    div.setAttribute('class', 'avatar')
-    div.setAttribute('id', 'user')
-    validName = true
-    image.onerror = function () {
+    inputName.value = ''
+  }
+
+  if (inputName.value != window.localStorage.getItem('name')) {
+    if (inputName.value != '') {
+      const image = document.createElement("img")
+      const div = document.createElement('div')
+      image.src = `https://github.com/${inputName.value}.png`
+      div.appendChild(image)
+      div.setAttribute('class', 'avatar')
+      div.setAttribute('id', 'user')
+      validName = true
+      image.onerror = function () {
+        validName = false
+        div.remove()
+      };
+      const userInfo = chatHeader.lastElementChild;
+      if (validName) userInfo.appendChild(div)
+    } else {
       validName = false
-      div.remove()
-    };
-    const userInfo = chatHeader.lastElementChild;
-    if (document.querySelector(`#user`)) document.querySelector(`#user`).remove()
-    if (validName) userInfo.appendChild(div)
-  } else {
-    validName = false
+      chatHeader.classList.add('red')
+      if (document.querySelector(`#user`)) document.querySelector(`#user`).remove()
+    }
   }
 
   if (validName && validChannel) chatHeader.classList.remove('red');
@@ -271,13 +281,11 @@ const generateIfLink = (word) => {
 const sendMessage = (event) => {
   event.preventDefault();
   const msgInput = document.querySelector('#your-message');
-  const currentName = document.querySelector('#your-name').value
+  const channel = window.localStorage.getItem('channel')
 
   if (event.key === "Enter" && msgInput === document.activeElement) {
-    let error
     if (!validName) {
-      error = users.includes(currentName) ? 'Name already in use.' : 'Please add a valid username.'
-      alert(error)
+      alert('Please add a valid username.')
     } else if (!validChannel) {
       alert('Please add a valid channel.')
     } else {
@@ -288,8 +296,9 @@ const sendMessage = (event) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ author: yourName, content: yourMessage }),
       });
+      const currentName = `${yourName}@${channel}`
       document.querySelector('#your-message').value = ''
-      window.localStorage.setItem('name', currentName)
+      window.localStorage.setItem('name', yourName)
       window.localStorage.setItem('myName', currentName)
       refresh();
     }

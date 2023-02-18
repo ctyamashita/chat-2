@@ -285,7 +285,8 @@ input, span {
 }
 
 .initial-pos-head {
-  margin-top: 50%;
+  margin-top: 50vh;
+  transform: translateY(-50%);
   border-radius: 12px;
 }
 
