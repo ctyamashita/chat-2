@@ -229,7 +229,6 @@ const areInputsValid = () => {
     if (document.querySelector(`#user`)) document.querySelector(`#user`).remove()
   }
 
-
   if (validName && validChannel) chatHeader.classList.remove('red');
 
   if (validName) {
