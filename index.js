@@ -236,7 +236,7 @@ const areInputsValid = () => {
     if (window.localStorage.getItem('name') != inputName.value) {
       updateBubbles()
       window.localStorage.setItem('name', inputName.value)
-      window.localStorage.setItem('myName', '')
+      // window.localStorage.setItem('myName', '')
     }
   }
 
