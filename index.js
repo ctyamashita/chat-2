@@ -204,27 +204,31 @@ const areInputsValid = () => {
     inputName.value = ''
   }
 
-  if (inputName.value != window.localStorage.getItem('name')) {
-    if (inputName.value != '') {
-      const image = document.createElement("img")
-      const div = document.createElement('div')
-      image.src = `https://github.com/${inputName.value}.png`
-      div.appendChild(image)
-      div.setAttribute('class', 'avatar')
-      div.setAttribute('id', 'user')
-      validName = true
-      image.onerror = function () {
-        validName = false
-        div.remove()
-      };
-      const userInfo = chatHeader.lastElementChild;
-      if (validName) userInfo.appendChild(div)
-    } else {
+  if (inputName.value != '') {
+    const image = document.createElement("img")
+    const div = document.createElement('div')
+    const name = inputName.value || window.localStorage.getItem('name')
+    image.src = `https://github.com/${name}.png`
+    div.appendChild(image)
+    div.setAttribute('class', 'avatar')
+    div.setAttribute('id', 'user')
+    validName = true
+    image.onerror = function () {
       validName = false
-      chatHeader.classList.add('red')
-      if (document.querySelector(`#user`)) document.querySelector(`#user`).remove()
-    }
+      div.remove()
+    };
+    const userInfo = chatHeader.lastElementChild;
+    if (validName) userInfo.appendChild(div)
+    if (document.querySelectorAll(`#user`).length > 1) document.querySelector(`#user`).remove()
+  } else {
+    validName = false
   }
+
+  if (!validName) {
+    chatHeader.classList.add('red')
+    if (document.querySelector(`#user`)) document.querySelector(`#user`).remove()
+  }
+
 
   if (validName && validChannel) chatHeader.classList.remove('red');
 
@@ -244,7 +248,7 @@ areInputsValid()
 const channelInput = document.querySelector('#channel')
 const nameInput = document.querySelector('#your-name')
 channelInput.addEventListener('blur', areInputsValid)
-nameInput.addEventListener('blur', areInputsValid)
+nameInput.addEventListener('change', areInputsValid)
 
 // selecting message board
 
