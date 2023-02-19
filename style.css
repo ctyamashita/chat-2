@@ -281,6 +281,10 @@ input, span {
   transform: translateY(50px) scaleY(0);
 }
 
+.d-none {
+  display: none;
+}
+
 .name-container {
   display: flex;
   align-items: center;

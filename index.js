@@ -48,7 +48,7 @@ const buildMsg = (message) => {
   if (name === message.author) {
     bubbleContainer.classList.add('bubble-container-right')
     bubble.classList.add('right')
-    avatar.classList.add('hide')
+    avatar.classList.add('d-none')
   } else {
     bubbleContainer.classList.add('bubble-container-left')
     bubble.classList.add('left')
@@ -174,7 +174,7 @@ const areInputsValid = () => {
   if (!(channel === '' || channel === null || !Number.isInteger(Number(channel)))) {
     chatHeader.classList.remove('initial-pos-head');
     msgInput.classList.remove('hide');
-    messageContainer.classList.remove('hide');
+    messageContainer.classList.remove('d-none');
     if (oldChannel != channel) {
       baseUrl = `https://wagon-chat.herokuapp.com/${channel}/messages`;
       lastMsg = false
@@ -191,7 +191,7 @@ const areInputsValid = () => {
   } else {
     chatHeader.classList.add('red', 'initial-pos-head');
     msgInput.classList.add('hide');
-    messageContainer.classList.add('hide');
+    messageContainer.classList.add('d-none');
     window.localStorage.setItem('channel', '')
     channelInput.value = ''
   }
