@@ -188,6 +188,7 @@ const areInputsValid = () => {
     }
     validChannel = true
     window.localStorage.setItem('channel', channel)
+    document.title = `#${channel} Channel`
   } else {
     chatHeader.classList.add('red', 'initial-pos-head');
     msgInput.classList.add('hide');
