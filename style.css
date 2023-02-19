@@ -295,3 +295,7 @@ input, span {
   transform: translateY(-50%);
   border-radius: 12px;
 }
+
+.img-msg {
+  width: 100%;
+}

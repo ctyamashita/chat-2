@@ -150,13 +150,13 @@ const updateBubbles = () => {
         bubble.firstElementChild.classList.add('right')
         bubble.classList.remove('bubble-container-left')
         bubble.firstElementChild.classList.remove('left')
-        bubble.firstElementChild.firstElementChild.classList.add('hide')
+        bubble.firstElementChild.firstElementChild.classList.add('d-none')
       } else {
         bubble.classList.remove('bubble-container-right')
         bubble.firstElementChild.classList.remove('right')
         bubble.classList.add('bubble-container-left')
         bubble.firstElementChild.classList.add('left')
-        bubble.firstElementChild.firstElementChild.classList.remove('hide')
+        bubble.firstElementChild.firstElementChild.classList.remove('d-none')
       }
     })
   }
@@ -270,14 +270,28 @@ const addYoutubeVideo = (url) => {
   return `<iframe width="100%" height="180" src="https://www.youtube.com/embed/${id}" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; web-share" allowfullscreen></iframe>`
 }
 
-const generateIfLink = (word) => {
-  let domain
-  if (word.match(regex)) domain = word.match(regex)[2]
+const addGiphy = (url) => {
+  const giphyRegex = /https:\/\/giphy\.com\/clips\/(\w+-)*(\w+)/
+  const id = url.match(giphyRegex)[2]
+  return `<iframe frameBorder="0" width="100%" height="180" src="https://giphy.com/embed/${id}/video"></iframe>`
+}
 
-  if (regex.test(word) && domain && domain === 'youtube' || domain === 'youtu') {
-    return addYoutubeVideo(word)
+const addImage = (url) => {
+  return `<img class="img-msg" src=${url} />`
+}
+
+const generateIfLink = (text) => {
+  let domain
+  if (text.match(regex)) domain = text.match(regex)[2]
+
+  if (regex.test(text) && domain && domain === 'youtube' || domain === 'youtu') {
+    return addYoutubeVideo(text)
+  } else if (regex.test(text) && domain && domain === 'giphy') {
+    return addGiphy(text)
+  } else if (/(\.jpg|\.png|\.gif)$/.test(text)) {
+    return addImage(text)
   } else {
-    return regex.test(word) ? `<a href="${word}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a>` : word
+    return regex.test(text) ? `<a href="${text}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a>` : text
   }
 }
 
