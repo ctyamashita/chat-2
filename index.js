@@ -3,6 +3,7 @@
 let channel = new URL(window.location.href).searchParams.get("channel") || window.localStorage.getItem('channel');
 
 let users = []
+let afkUsers = []
 
 window.localStorage.setItem('channel', channel)
 document.querySelector("#channel").value = channel
@@ -19,7 +20,7 @@ if (window.localStorage.getItem('name')) {
 
 
 const buildLine = (messageContent) => {
-  const line = document.createElement('p')
+  const line = document.createElement('p');
   line.classList.add('msg-txt')
   line.innerHTML = generateIfLink(messageContent)
   return line
@@ -29,7 +30,7 @@ const buildLine = (messageContent) => {
 const buildMsg = (message) => {
   const name = window.localStorage.getItem('name')
   // preventing html code injection
-  let content = message.content.replaceAll(/</g, "[").replaceAll(/>/g, "]")
+  let content = message.content;
 
   content =  generateIfLink(content)
 
@@ -115,7 +116,8 @@ const fetchMessages = () => {
           }
         }
         data.messages.forEach((message) => {
-          if (!users.includes(message.author)) users.push(message.author)
+          if (!users.includes(message.author)) users.push(message.author);
+
           if (message.id > lastMsg.id) {
             addMessage(message)
             if (lastMsg.id != message.id) messageBoard.lastElementChild.scrollIntoView();
@@ -123,6 +125,15 @@ const fetchMessages = () => {
           }
         });
 
+      } else {
+        const userEl = document.querySelectorAll('user-list-item');
+        if (userEl) {
+          userEl.forEach((user) => {
+            user.classList.add('offline');
+          });
+        }
+        afkUsers = users
+        users = []
       }
     });
 }
@@ -292,7 +303,12 @@ const generateIfLink = (text) => {
   } else if (/(\.jpg|\.png|\.gif)$/.test(text)) {
     return addImage(text)
   } else {
-    return regex.test(text) ? `<a href="${text}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a>` : text
+    if (regex.test(text)) {
+      return `<a href="${text}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a>
+      <iframe class="popup-external" src="https://www.w3schools.com" title="W3Schools Free Online Web Tutorials"></iframe>`
+    } else {
+      return text
+    }
   }
 }
 
@@ -307,7 +323,7 @@ const sendMessage = (event) => {
     } else if (!validChannel) {
       alert('Please add a valid channel.')
     } else {
-      const yourMessage = msgInput.value;
+      const yourMessage = msgInput.value.replaceAll(/&/g, "&amp;").replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
       const yourName = window.localStorage.getItem('name')
       fetch(baseUrl, {
         method: "POST",
@@ -326,7 +342,27 @@ const sendMessage = (event) => {
 const form = document.querySelector("#comment-form");
 form.addEventListener("keyup", sendMessage);
 
+let currentCount = 0
 
 setInterval(() => {
-  refresh()
+  refresh();
+  if (afkUsers.length !== users.length) {
+    currentCount = users.length
+    document.querySelector('#count > span').innerHTML = currentCount;
+    const names = document.querySelectorAll('.user-list-item');
+    if (names.length > 0) {
+      names.forEach((name) => users.includes(name.innerHTML) ? name.classList.remove('offline') : name.classList.add('offline'))
+    } else {
+      const list = document.querySelector('#list');
+      const usernames = users.map((user) => `<p class="user-list-item">${user}</p>`)
+      list.innerHTML = usernames.join('')
+    }
+
+  }
 }, 1000);
+
+const btnList = document.querySelector('#count');
+btnList.addEventListener('click', () => {
+  const list = document.querySelector('#list');
+  list.classList.toggle('hide');
+})

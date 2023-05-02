@@ -264,12 +264,13 @@ input, span {
   text-align: center;
   color: #2C8C99;
   transition-duration: .3s;
+  padding: 3px 8px 4px 6px;
 }
 
 .link:hover {
   box-shadow: 0 2px 4px rgba(0, 0, 0, .1);
   color: #28464B;
-  padding: 0 8px 0 6px;
+  padding: 3px 8px 4px 6px;
   border-radius: 50px;
   background: oldlace;
   transition-duration: 1s;
@@ -302,4 +303,47 @@ input, span {
 
 .img-msg {
   width: 100%;
+}
+
+#count {
+  z-index: 999;
+  position: absolute;
+  text-align: center;
+  top: 56px;
+  left: 50%;
+  font-weight: bolder;
+  font-size: 1.1rem;
+  background: white;
+  transform: translateX(-50%);
+  border-radius: 12px;
+  color: #3c3c3c;
+  border: solid 4px #3c3c3c;
+  padding: 4px 12px;
+  cursor: pointer;
+  transition: .3s;
+}
+
+#count:has(span:empty) {
+  display: none;
+}
+
+.hide {
+  height: 0;
+  width: 0;
+}
+
+/* #count:has(#list.hide) {
+  width: auto;
+} */
+
+.user-list-item {
+  text-align: left;
+  margin: 0;
+  font-size: 14px;
+  font-weight: 500;
+  border-top: solid 1px lightgray;
+}
+
+.offline {
+  color: lightgrey;
 }
