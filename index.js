@@ -29,7 +29,7 @@ const buildLine = (messageContent) => {
 const buildMsg = (message) => {
   const name = window.localStorage.getItem('name')
   // preventing html code injection
-  let content = message.content.replaceAll(/</g, "&lt").replaceAll(/>/g, "&gt")
+  let content = message.content.replaceAll(/</g, "[").replaceAll(/>/g, "]")
 
   content =  generateIfLink(content)
 
