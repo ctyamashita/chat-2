@@ -131,6 +131,7 @@ form {
 
 .msg-head {
   display: flex;
+  gap: 16px;
   justify-content: space-between;
   margin-bottom: 4px;
   border-bottom: solid 2px #2c8c993e
