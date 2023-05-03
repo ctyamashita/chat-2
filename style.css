@@ -278,6 +278,10 @@ input, span {
 
 .msg-txt {
   line-height: 1.2;
+  margin-bottom: 4px;
+}
+
+.msg-container :last-child {
   margin: 0;
 }
 
@@ -320,6 +324,7 @@ input, span {
   border: solid 4px #3c3c3c;
   padding: 4px 12px;
   cursor: pointer;
+  box-shadow: 2px 2px 16px rgb(0 0 0 / 10%);
   transition: .3s;
 }
 
@@ -333,8 +338,17 @@ input, span {
 }
 
 /* #count:has(#list.hide) {
-  width: auto;
+  background-color: white;
 } */
+
+#list {
+  max-height: 200px;
+  overflow-y: scroll;
+}
+
+#list::-webkit-scrollbar {
+  display: none;
+}
 
 .user-list-item {
   text-align: left;
@@ -344,6 +358,27 @@ input, span {
   border-top: solid 1px lightgray;
 }
 
-.offline {
-  color: lightgrey;
+.user-list-item > span {
+  color: limegreen;
 }
+
+.offline {
+  color: darkgrey;
+}
+
+.offline > span {
+  color: indianred;
+}
+
+/* <style>
+@keyframes tilt {
+  0% {transform: rotate(-2deg); color: red; opacity: 1}
+  50% {transform: rotate(2deg); color: green; opacity: .7}
+  100% {transform: rotate(-2deg); color: blue; opacity: 1}
+}
+#messages p {
+  animation-name: tilt;
+  animation-iteration-count: infinite;
+  animation-duration: 2s;
+}
+</style> */

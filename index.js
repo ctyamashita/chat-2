@@ -30,9 +30,7 @@ const buildLine = (messageContent) => {
 const buildMsg = (message) => {
   const name = window.localStorage.getItem('name')
   // preventing html code injection
-  let content = message.content;
-
-  content =  generateIfLink(content)
+  // let content = message.content.replaceAll(/&/g, "&amp;").replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
 
   const time = new Date(message.created_at);
   const hours = time.getHours();
@@ -44,7 +42,7 @@ const buildMsg = (message) => {
   const img = document.createElement('img')
   const msgContainer = document.createElement('div')
   const msgHead = document.createElement('p')
-  const msg = buildLine(content)
+  const msg = buildLine(message.content)
 
   if (name === message.author) {
     bubbleContainer.classList.add('bubble-container-right')
@@ -55,7 +53,7 @@ const buildMsg = (message) => {
     bubble.classList.add('left')
   }
 
-  bubbleContainer.classList.add(message.author)
+  bubbleContainer.classList.add(message.author.replaceAll(" ", '-'))
   bubble.classList.add('bubble')
   avatar.classList.add('avatar')
   img.src = `https://github.com/${message.author}.png`
@@ -106,18 +104,23 @@ const fetchMessages = () => {
         const name = window.localStorage.getItem('name');
 
         if (users.includes(name) && window.localStorage.getItem('myName') != `${name}@${channel}`) areInputsValid()
+        const list = document.querySelector('#list');
         if (!lastMsg) {
           messageBoard.innerHTML = "";
           lastMsg = data.messages[0]
           if (lastMsg) {
             const msg = buildMsg(lastMsg);
             messageBoard.append(msg);
-            users.push(lastMsg.author)
+            users.push(lastMsg.author);
+            list.insertAdjacentHTML('beforeend', `<p class="user-list-item"><span>●</span> ${lastMsg.author}</p>`)
           }
         }
-        data.messages.forEach((message) => {
-          if (!users.includes(message.author)) users.push(message.author);
 
+        data.messages.forEach((message) => {
+          if (!users.includes(message.author)) {
+            users.push(message.author);
+            if (!afkUsers.includes(message.author)) list.insertAdjacentHTML('beforeend', `<p class="user-list-item"><span>●</span> ${message.author}</p>`)
+          }
           if (message.id > lastMsg.id) {
             addMessage(message)
             if (lastMsg.id != message.id) messageBoard.lastElementChild.scrollIntoView();
@@ -126,13 +129,7 @@ const fetchMessages = () => {
         });
 
       } else {
-        const userEl = document.querySelectorAll('user-list-item');
-        if (userEl) {
-          userEl.forEach((user) => {
-            user.classList.add('offline');
-          });
-        }
-        afkUsers = users
+        users.forEach((user) => afkUsers.push(user))
         users = []
       }
     });
@@ -208,7 +205,7 @@ const areInputsValid = () => {
     channelInput.value = ''
   }
 
-  console.log(window.localStorage.getItem("myName"), channel, oldChannel)
+  // console.log(window.localStorage.getItem("myName"), channel, oldChannel)
 
   if (users.includes(inputName.value) && window.localStorage.getItem("myName") != `${inputName.value}@${oldChannel}`) {
     validName = false
@@ -304,10 +301,9 @@ const generateIfLink = (text) => {
     return addImage(text)
   } else {
     if (regex.test(text)) {
-      return `<a href="${text}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a>
-      <iframe class="popup-external" src="https://www.w3schools.com" title="W3Schools Free Online Web Tutorials"></iframe>`
+      return `<a href="${text}" class="link" target=_blank><strong><i class="fa-solid fa-link"></i> ${domain}</strong></a> `
     } else {
-      return text
+      return text.replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;")
     }
   }
 }
@@ -323,7 +319,7 @@ const sendMessage = (event) => {
     } else if (!validChannel) {
       alert('Please add a valid channel.')
     } else {
-      const yourMessage = msgInput.value.replaceAll(/&/g, "&amp;").replaceAll(/</g, "&lt;").replaceAll(/>/g, "&gt;");
+      const yourMessage = msgInput.value;
       const yourName = window.localStorage.getItem('name')
       fetch(baseUrl, {
         method: "POST",
@@ -346,19 +342,11 @@ let currentCount = 0
 
 setInterval(() => {
   refresh();
-  if (afkUsers.length !== users.length) {
-    currentCount = users.length
-    document.querySelector('#count > span').innerHTML = currentCount;
-    const names = document.querySelectorAll('.user-list-item');
-    if (names.length > 0) {
-      names.forEach((name) => users.includes(name.innerHTML) ? name.classList.remove('offline') : name.classList.add('offline'))
-    } else {
-      const list = document.querySelector('#list');
-      const usernames = users.map((user) => `<p class="user-list-item">${user}</p>`)
-      list.innerHTML = usernames.join('')
-    }
-
-  }
+  const names = document.querySelectorAll('.user-list-item');
+  currentCount = (afkUsers.length === 0) ? users.length : names.length
+  const previousCount = document.querySelector('#count > span')
+  if (previousCount.innerHTML != currentCount) previousCount.innerHTML = currentCount;
+  names.forEach((name) => (afkUsers.includes(name.innerHTML.replace('<span>●</span> ', '')) && !users.includes(name.innerHTML.replace('<span>●</span> ', ''))) ? name.classList.add('offline') : name.classList.remove('offline'))
 }, 1000);
 
 const btnList = document.querySelector('#count');
@@ -366,3 +354,8 @@ btnList.addEventListener('click', () => {
   const list = document.querySelector('#list');
   list.classList.toggle('hide');
 })
+
+
+// users = users.filter((value, index, array) => array.indexOf(value) === index);
+//             const usernames = users.map((user) => `<p class="user-list-item">${user}</p>`);
+//             list.innerHTML = usernames.join('');
